@@ -20,7 +20,7 @@ router.post("/users/login", async (req, res) => {
   }
 });
 
-//create user account
+//create user account. Need to provide name,email and password
 router.post("/users/create", async (req, res) => {
   const userData = req.body;
 
@@ -77,10 +77,9 @@ router.patch("/users/me", authenticateMiddleware, async (req, res) => {
   }
 });
 
-//update password
+//update password. Need to provide currentPassword and new password. if current password matches, password is updated
 router.patch("/users/me/password", authenticateMiddleware, async (req, res) => {
   try {
-    //passwordData contains current password and new password
     const passwordData = req.body;
 
     //check if user's current password exists. If not, error will be thrown
@@ -92,6 +91,46 @@ router.patch("/users/me/password", authenticateMiddleware, async (req, res) => {
     await req.user.save();
   } catch (e) {
     res.status(400).send({ error: e.message });
+  }
+});
+
+//log off a single device
+router.post("/users/logout", authenticateMiddleware, async (req, res) => {
+  try {
+    //remove current token from user's tokens list
+    req.user.tokens = req.user.tokens.filter(
+      (tokenObject) => tokenObject.token !== req.token
+    );
+
+    await req.user.save();
+
+    res.send();
+  } catch (e) {
+    res.status(500).send({ error: e.message });
+  }
+});
+
+//log off all devices
+router.post("/users/logout/all", authenticateMiddleware, async (req, res) => {
+  try {
+    req.user.tokens = [];
+
+    await req.user.save();
+
+    res.send();
+  } catch (e) {
+    res.status(500).send({ error: e.message });
+  }
+});
+
+//delete profile
+router.delete("/users/me/delete", authenticateMiddleware, async (req, res) => {
+  try {
+    await req.user.deleteOne();
+
+    res.send();
+  } catch (e) {
+    res.status(500).send({ error: e.message });
   }
 });
 

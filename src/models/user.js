@@ -3,6 +3,10 @@ const validator = require("validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+const Task = require("../models/task.js");
+const Note = require("../models/note.js");
+const Project = require("../models/project.js");
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -53,6 +57,18 @@ userSchema.virtual("projects", {
   foreignField: "owner",
   localField: "_id",
 });
+
+//before we delete a user, remove all their tasks, notes and projects from database
+userSchema.pre(
+  "deleteOne",
+  { query: false, document: true },
+  async function () {
+    const user = this;
+    await Task.deleteMany({ owner: user._id });
+    await Note.deleteMany({ owner: user._id });
+    await Project.deleteMany({ owner: user._id });
+  }
+);
 
 //hash user's password before saving user document
 userSchema.pre("save", async function () {

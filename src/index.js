@@ -7,7 +7,7 @@ const tasksRouter = require("./routers/tasks.js");
 const notesRouter = require("./routers/notes.js");
 const projectsRouter = require("./routers/projects.js");
 const User = require("./models/user.js");
-
+const Task = require("./models/task.js");
 //creates our express application
 const app = express();
 
