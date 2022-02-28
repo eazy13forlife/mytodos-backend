@@ -1,8 +1,10 @@
 const mongoose = require("mongoose");
 
-const noteScheme = new mongoose.Schema({
+const noteSchema = new mongoose.Schema({
   title: {
     type: String,
+    required: true,
+    trim: true,
   },
   description: {
     type: String,

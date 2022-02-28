@@ -4,14 +4,10 @@ const path = require("path");
 
 const usersRouter = require("./routers/users.js");
 const tasksRouter = require("./routers/tasks.js");
+const notesRouter = require("./routers/notes.js");
+const projectsRouter = require("./routers/projects.js");
 const User = require("./models/user.js");
 
-const me = new User({ name: "jo", email: "sal" });
-me.save()
-  .then()
-  .catch((error) => {
-    console.log(error);
-  });
 //creates our express application
 const app = express();
 
@@ -28,6 +24,8 @@ const publicPath = path.join(__dirname, "../public/");
 app.use(express.json());
 app.use(usersRouter);
 app.use(tasksRouter);
+app.use(notesRouter);
+app.use(projectsRouter);
 
 app.listen(port, () => {
   console.log(`Your express server is running on port ${port}.`);

@@ -2,18 +2,27 @@ const mongoose = require("mongoose");
 
 const taskSchema = new mongoose.Schema(
   {
-    task: {
+    title: {
       type: String,
       required: true,
+      trim: true,
     },
     description: {
       type: String,
     },
     dueDate: {
       type: String,
+      trim: true,
     },
     priority: {
       type: String,
+    },
+    project: {
+      type: String,
+    },
+    projectOwner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Project",
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
