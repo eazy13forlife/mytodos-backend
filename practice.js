@@ -17,5 +17,6 @@ const jwtPractice = async () => {
   const isValid = await jwt.verify(token, "secretKey");
   console.log(isValid);
 };
-
+console.log(Date.now());
+console.log(Date.parse("August 8 2022") > Date.now());
 console.log(jwtPractice());

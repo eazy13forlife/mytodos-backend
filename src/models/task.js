@@ -11,18 +11,19 @@ const taskSchema = new mongoose.Schema(
       type: String,
     },
     dueDate: {
-      type: String,
+      type: Date,
       trim: true,
+      validate(date) {
+        if (Date.parse(date) < Date.now()) {
+          throw new Error("Due date cannot be before today");
+        }
+      },
     },
     priority: {
       type: String,
     },
     project: {
       type: String,
-    },
-    projectOwner: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Project",
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,

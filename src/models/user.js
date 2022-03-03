@@ -7,37 +7,42 @@ const Task = require("../models/task.js");
 const Note = require("../models/note.js");
 const Project = require("../models/project.js");
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    validate(value) {
-      if (!validator.isEmail(value)) {
-        throw new Error("Invalid email");
-      }
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
     },
-  },
-  password: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  tokens: [
-    {
-      token: {
-        type: String,
-        required: true,
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Invalid email");
+        }
       },
     },
-  ],
-});
+    password: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    tokens: [
+      {
+        token: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+  },
+  {
+    timestamps: true,
+  }
+);
 
 //create virtual field for tasks, notes and projects so we can populate all the tasks,notes and projects for a specific user easier
 userSchema.virtual("tasks", {
