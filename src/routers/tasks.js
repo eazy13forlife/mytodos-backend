@@ -49,14 +49,17 @@ router.patch("/tasks/:id", authenticateMiddleware, async (req, res) => {
       }
     }
 
-    const updatedTask = await Task.findByIdAndUpdate(id, updateData, {
-      new: true,
-      runValidators: true,
-    });
+    const task = await Task.findById(id);
 
-    if (!updatedTask) {
+    if (!task) {
       return res.status(404).send();
     }
+
+    updateFields.forEach((field) => {
+      task[field] = updateData[field];
+    });
+
+    const updatedTask = await task.save();
 
     res.send(updatedTask);
   } catch (e) {
@@ -82,11 +85,12 @@ router.get("/tasks/:id", authenticateMiddleware, async (req, res) => {
 });
 
 router.get("/tasks", authenticateMiddleware, async (req, res) => {
+  const match = req.query;
   try {
-    await req.user.populate("tasks");
+    await req.user.populate({ path: "tasks", match });
 
     res.send(req.user.tasks);
-  } catch {
+  } catch (e) {
     res.status(500).send();
   }
 });
