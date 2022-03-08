@@ -43,18 +43,5 @@ const checkDateInFuture = (todaysDate, newDate) => {
   return true;
 };
 
-console.log(
-  validator.isDate("08/09/2098", {
-    format: "MM-DD-YYYY",
-    delimiters: ["/", "-"],
-  })
-);
-
-const currentDate = moment().format("YYYY-MM-DD");
-console.log(moment(currentDate).valueOf());
-validator.isBefore("03/23/2024", "02/22/2023");
-
-const mike = "hello";
-const dog = mike.split("");
-console.log(mike);
-console.log(dog);
+const specifiedDateParsed = moment("03-08-2022", "MM-DD-YYYY").valueOf();
+console.log(moment("03-08-2022", "MM-DD-YYYY").toISOString());

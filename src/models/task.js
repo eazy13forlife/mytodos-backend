@@ -3,6 +3,26 @@ const validator = require("validator");
 const formatDate = require("../helperFunctions/dates.js");
 const moment = require("moment");
 
+//validator for my date field.Takes in date in unix.
+const dateValidation = (date) => {
+  if (
+    !validator.isDate(date, {
+      format: "MM-DD-YYYY",
+      delimiters: ["/", "-"],
+    })
+  ) {
+    throw new Error("Invalid date format");
+  }
+
+  const todaysDateParsed = moment().startOf("day").valueOf();
+
+  const specifiedDateParsed = moment(date, "MM-DD-YYYY").valueOf();
+
+  if (moment(specifiedDateParsed).isBefore(todaysDateParsed)) {
+    throw new Error("Date cannot be before today");
+  }
+};
+
 const taskSchema = new mongoose.Schema(
   {
     title: {
@@ -12,31 +32,14 @@ const taskSchema = new mongoose.Schema(
     },
     completed: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     description: {
       type: String,
     },
     dueDate: {
       type: String,
-      trim: true,
-      validate(date) {
-        const valid = validator.isDate(date, {
-          format: "MM-DD-YYYY",
-          delimiters: ["/", "-"],
-        });
-
-        if (!valid) {
-          throw new Error("Invalid date");
-        }
-
-        const todaysDate = moment().format("YYYY-MM-DD");
-        const specifiedDate = formatDate(date);
-
-        if (moment(specifiedDate).isBefore(todaysDate)) {
-          throw new Error("Date cannot be before today");
-        }
-      },
+      validate: dateValidation,
     },
     priority: {
       type: String,
@@ -55,17 +58,11 @@ const taskSchema = new mongoose.Schema(
   }
 );
 
-//change dueDate to a unix timestamp before we save a task. Our validators are run first by the way and then this is run before officially saving.
+//convert our dueDate to an ISOString before saving in our document
 taskSchema.pre("save", function () {
   const task = this;
-
-  if (task.isModified("dueDate")) {
-    const originalDueDate = task.dueDate;
-
-    const newDateString = formatDate(originalDueDate);
-
-    task.dueDate = moment(newDateString).valueOf();
-  }
+  console.log("dad");
+  task.dueDate = moment(task.dueDate, "MM-DD-YYYY").toISOString();
 });
 
 const Task = mongoose.model("Task", taskSchema);

@@ -1,5 +1,6 @@
 const express = require("express");
 const router = new express.Router();
+const moment = require("moment");
 
 const Task = require("../models/task.js");
 const authenticateMiddleware = require("../middleware/authenticate.js");
@@ -67,6 +68,47 @@ router.patch("/tasks/:id", authenticateMiddleware, async (req, res) => {
   }
 });
 
+router.patch("/tasks2/:id", authenticateMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const updateData = req.body;
+
+    const updateFields = Object.keys(updateData);
+
+    const certifiedFields = [
+      "title",
+      "description",
+      "dueDate",
+      "priority",
+      "project",
+    ];
+
+    //make sure user is only changing valid fields
+    for (let i = 0; i < updateFields; i++) {
+      const field = updateFields[i];
+      if (!certifiedFields.includes(field)) {
+        return res
+          .status(400)
+          .send({ error: `${field} isn't valid to change` });
+      }
+    }
+
+    const task = await Task.findOneAndReplace(
+      { dueDate: 1646467200000 },
+      { dueDate: 1586934000000 },
+      { runValidators: true }
+    );
+    if (!task) {
+      return res.status(404).send();
+    }
+
+    res.send(task);
+  } catch (e) {
+    res.status(500).send(e.message);
+  }
+});
+
 router.get("/tasks/:id", authenticateMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
@@ -85,13 +127,46 @@ router.get("/tasks/:id", authenticateMiddleware, async (req, res) => {
 });
 
 router.get("/tasks", authenticateMiddleware, async (req, res) => {
-  const match = req.query;
-  try {
-    await req.user.populate({ path: "tasks", match });
+  const query = req.query;
 
-    res.send(req.user.tasks);
+  //create sort object
+  const sort = {};
+
+  if ("sortBy" in query) {
+    const sortArray = query.sortBy.split("_");
+
+    sortArray.forEach((sortingPair) => {
+      const pairArray = sortingPair.split(":");
+      sort[pairArray[0]] = pairArray[1];
+    });
+  }
+
+  //create filters object;
+  const filter = {};
+
+  Object.keys(query).forEach((key) => {
+    if (key !== "sortBy") {
+      filter[key] = query[key];
+    }
+  });
+
+  //updating filter for dueDate
+  if ("dueDate" in filter) {
+    const todaysDateParsed = moment().startOf("day").toISOString();
+
+    if (filter.dueDate === "today") {
+      filter.dueDate = { $eq: todaysDateParsed };
+    } else if (match.dueDate === "upcoming") {
+      filter.dueDate = { $gt: todaysDateParsed };
+    }
+  }
+
+  try {
+    await req.user.populate({ path: "tasks", filter, sort });
+
+    res.status(200).send(req.user.tasks);
   } catch (e) {
-    res.status(500).send();
+    res.status(500).send(e.message);
   }
 });
 
