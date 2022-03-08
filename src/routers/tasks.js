@@ -68,47 +68,6 @@ router.patch("/tasks/:id", authenticateMiddleware, async (req, res) => {
   }
 });
 
-router.patch("/tasks2/:id", authenticateMiddleware, async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const updateData = req.body;
-
-    const updateFields = Object.keys(updateData);
-
-    const certifiedFields = [
-      "title",
-      "description",
-      "dueDate",
-      "priority",
-      "project",
-    ];
-
-    //make sure user is only changing valid fields
-    for (let i = 0; i < updateFields; i++) {
-      const field = updateFields[i];
-      if (!certifiedFields.includes(field)) {
-        return res
-          .status(400)
-          .send({ error: `${field} isn't valid to change` });
-      }
-    }
-
-    const task = await Task.findOneAndReplace(
-      { dueDate: 1646467200000 },
-      { dueDate: 1586934000000 },
-      { runValidators: true }
-    );
-    if (!task) {
-      return res.status(404).send();
-    }
-
-    res.send(task);
-  } catch (e) {
-    res.status(500).send(e.message);
-  }
-});
-
 router.get("/tasks/:id", authenticateMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
@@ -162,7 +121,11 @@ router.get("/tasks", authenticateMiddleware, async (req, res) => {
   }
 
   try {
-    await req.user.populate({ path: "tasks", filter, sort });
+    await req.user.populate({
+      path: "tasks",
+      match: filter,
+      options: { sort: sort },
+    });
 
     res.status(200).send(req.user.tasks);
   } catch (e) {
@@ -185,5 +148,47 @@ router.delete("/tasks/:id", authenticateMiddleware, async (req, res) => {
     res.send();
   } catch {
     res.status(500).send();
+  }
+});
+
+//practice route////////////////////////////////////
+router.patch("/tasks2/:id", authenticateMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const updateData = req.body;
+
+    const updateFields = Object.keys(updateData);
+
+    const certifiedFields = [
+      "title",
+      "description",
+      "dueDate",
+      "priority",
+      "project",
+    ];
+
+    //make sure user is only changing valid fields
+    for (let i = 0; i < updateFields; i++) {
+      const field = updateFields[i];
+      if (!certifiedFields.includes(field)) {
+        return res
+          .status(400)
+          .send({ error: `${field} isn't valid to change` });
+      }
+    }
+
+    const task = await Task.findOneAndReplace(
+      { dueDate: 1646467200000 },
+      { dueDate: 1586934000000 },
+      { runValidators: true }
+    );
+    if (!task) {
+      return res.status(404).send();
+    }
+
+    res.send(task);
+  } catch (e) {
+    res.status(500).send(e.message);
   }
 });

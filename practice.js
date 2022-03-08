@@ -45,3 +45,12 @@ const checkDateInFuture = (todaysDate, newDate) => {
 
 const specifiedDateParsed = moment("03-08-2022", "MM-DD-YYYY").valueOf();
 console.log(moment("03-08-2022", "MM-DD-YYYY").toISOString());
+
+const people = ["mike", "sally", "dome"];
+people.forEach((person) => {
+  if (person === "mike") {
+    return "done";
+  } else {
+    console.log(person);
+  }
+});
