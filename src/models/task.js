@@ -61,7 +61,6 @@ const taskSchema = new mongoose.Schema(
 //convert our dueDate to an ISOString before saving in our document
 taskSchema.pre("save", function () {
   const task = this;
-  console.log("dad");
   task.dueDate = moment(task.dueDate, "MM-DD-YYYY").toISOString();
 });
 

@@ -111,12 +111,12 @@ router.get("/tasks", authenticateMiddleware, async (req, res) => {
 
   //updating filter for dueDate
   if ("dueDate" in filter) {
-    const todaysDateParsed = moment().startOf("day").toISOString();
+    const todaysDate = moment().startOf("day").toISOString();
 
     if (filter.dueDate === "today") {
-      filter.dueDate = { $eq: todaysDateParsed };
-    } else if (match.dueDate === "upcoming") {
-      filter.dueDate = { $gt: todaysDateParsed };
+      filter.dueDate = { $eq: todaysDate };
+    } else if (filter.dueDate === "upcoming") {
+      filter.dueDate = { $gt: todaysDate };
     }
   }
 
@@ -145,7 +145,7 @@ router.delete("/tasks/:id", authenticateMiddleware, async (req, res) => {
       return res.status(404).send();
     }
 
-    res.send();
+    res.send(deletedTask);
   } catch {
     res.status(500).send();
   }
