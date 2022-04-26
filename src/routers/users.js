@@ -4,7 +4,7 @@ const router = new express.Router();
 const User = require("../models/user.js");
 const authenticateMiddleware = require("../middleware/authenticate.js");
 
-//login user
+//login user. Takes in email and password
 router.post("/users/login", async (req, res) => {
   const { email, password } = req.body; //email and password
   try {
@@ -12,11 +12,11 @@ router.post("/users/login", async (req, res) => {
 
     const token = await user.generateAuthToken();
 
-    await user.save();
+    await user.save({ validateModifiedOnly: true });
 
     res.send({ user, token });
   } catch (e) {
-    res.status(401).send({ error: e.message });
+    res.status(401).send(e);
   }
 });
 
@@ -38,8 +38,8 @@ router.post("/users/create", async (req, res) => {
 
 //gets user info
 router.get("/users/me", authenticateMiddleware, (req, res) => {
-  const user = req.user;
-  res.send(user);
+  const { user, token } = req;
+  res.send({ user, token });
 });
 
 router.patch("/users/me", authenticateMiddleware, async (req, res) => {
@@ -102,11 +102,11 @@ router.post("/users/logout", authenticateMiddleware, async (req, res) => {
       (tokenObject) => tokenObject.token !== req.token
     );
 
-    await req.user.save();
+    await req.user.save({ validateModifiedOnly: true });
 
     res.send();
   } catch (e) {
-    res.status(500).send({ error: e.message });
+    res.status(500).send(e);
   }
 });
 

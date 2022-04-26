@@ -20,7 +20,7 @@ router.post("/tasks", authenticateMiddleware, async (req, res) => {
 
     res.status(201).send(savedTask);
   } catch (e) {
-    res.status(400).send({ error: e.message });
+    res.status(400).send(e);
   }
 });
 
@@ -35,6 +35,7 @@ router.patch("/tasks/:id", authenticateMiddleware, async (req, res) => {
     const certifiedFields = [
       "title",
       "description",
+      "completed",
       "dueDate",
       "priority",
       "project",
@@ -64,7 +65,7 @@ router.patch("/tasks/:id", authenticateMiddleware, async (req, res) => {
 
     res.send(updatedTask);
   } catch (e) {
-    res.status(500).send(e.message);
+    res.status(500).send(e);
   }
 });
 
@@ -129,7 +130,7 @@ router.get("/tasks", authenticateMiddleware, async (req, res) => {
 
     res.status(200).send(req.user.tasks);
   } catch (e) {
-    res.status(500).send(e.message);
+    res.status(500).send(e);
   }
 });
 

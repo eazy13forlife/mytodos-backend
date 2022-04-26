@@ -4,10 +4,9 @@ const User = require("../models/user.js");
 
 const authenticate = async (req, res, next) => {
   try {
-    console.log(req.headers);
     //get authToken by splitting at space that separates bearer from our authToken
     const authToken = req.headers.authorization.split(" ")[1];
-
+    console.log(authToken);
     //if jwt can't verify this auth token, an error will be thrown, otherwise we will get back the decoded data
     const decoded = await jwt.verify(authToken, process.env.JWT_SECRET);
 

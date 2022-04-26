@@ -81,6 +81,17 @@ router.get("/projects/:id/tasks", authenticateMiddleware, async (req, res) => {
     }
   });
 
+  //fix today and upcoming dueDate in match object
+  if (match.dueDate) {
+    const todaysDate = moment().startOf("day").toISOString();
+
+    if (match.dueDate === "today") {
+      match.dueDate = todaysDate;
+    } else if (match.dueDate === "upcoming") {
+      match.dueDate = { $gt: todaysDate };
+    }
+  }
+
   //populate sort object
   if (query.sortBy) {
     const sortFields = query.sortBy.split("_");
@@ -89,17 +100,6 @@ router.get("/projects/:id/tasks", authenticateMiddleware, async (req, res) => {
       const fieldArray = field.split(":");
       sort[fieldArray[0]] = fieldArray[1];
     });
-  }
-
-  //fix today and upcoming dueDate in sort object
-  if (sort.dueDate) {
-    const todaysDate = moment().startOf("day").toISOString();
-
-    if (sort.dueDate === "today") {
-      sort.dueDate = todaysDate;
-    } else if (sort.dueDate === "upcoming") {
-      sort.dueDate = { $gt: todaysDate };
-    }
   }
 
   try {
@@ -118,8 +118,8 @@ router.get("/projects/:id/tasks", authenticateMiddleware, async (req, res) => {
     }).sort(sort);
 
     res.send(allTasks);
-  } catch {
-    res.status(500).send();
+  } catch (e) {
+    res.status(500).send({ error: e.message });
   }
 });
 

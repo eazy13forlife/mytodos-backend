@@ -11,13 +11,13 @@ const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
+      required: [true, "Required"],
       trim: true,
     },
     email: {
       type: String,
-      required: true,
-      unique: true,
+      required: [true, "Required"],
+      unique: [true, "Email is already in use"],
       trim: true,
       validate(value) {
         if (!validator.isEmail(value)) {
@@ -27,8 +27,15 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: [true, "Required"],
       unique: true,
+      minLength: [7, "Password must be at least 7 characters"],
+      maxLength: [20, "Password must not be longer than 20 characters"],
+    },
+    tasksCompleted: {
+      type: Number,
+      required: true,
+      default: 0,
     },
     tokens: [
       {
@@ -78,6 +85,7 @@ userSchema.pre(
 //hash user's password before saving user document
 userSchema.pre("save", async function () {
   const user = this;
+
   if (user.isModified("password")) {
     //create hashed password
     const hashedPass = await bcrypt.hash(user.password, 10);

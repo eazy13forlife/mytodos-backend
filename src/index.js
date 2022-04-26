@@ -1,6 +1,7 @@
 const express = require("express");
 require("./db/mongoose.js");
 const path = require("path");
+const cors = require("cors");
 
 const usersRouter = require("./routers/users.js");
 const tasksRouter = require("./routers/tasks.js");
@@ -20,6 +21,13 @@ const publicPath = path.join(__dirname, "../public/");
 //set up express to use public directory
 //app.use(express.static(publicPath));
 
+app.use(
+  cors({
+    allowedHeaders: ["Content-Type", "authorization"],
+    origin: "*",
+    preflightContinue: true,
+  })
+);
 //server parses incoming json received
 app.use(express.json());
 app.use(usersRouter);
