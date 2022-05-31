@@ -5,8 +5,9 @@ const projectSchema = new mongoose.Schema({
   title: {
     type: String,
     trim: true,
-    required: true,
+    required: [true, "Required"],
     unique: true,
+    maxLength: [120, "Title must not be greater than 120 characters"],
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
@@ -21,16 +22,27 @@ projectSchema.virtual("tasks", {
   localField: "_id",
 });
 
+projectSchema.methods.toJSON = function () {
+  const project = this;
+  const projectObject = project.toObject();
+
+  delete projectObject.owner;
+
+  return projectObject;
+};
+
 //before we delete a project, update all tasks that have this project attached to it
 projectSchema.pre("findOneAndDelete", async function () {
   //we need the projects name and we find it via the id we provided
   const project = await Project.findById(this.getQuery()._id);
-
+  console.log(project);
   //get all tasks that have its project name as the one we are deleting and set its value to undefined
   const allTasks = await Task.updateMany(
-    { project: project.title },
-    { project: undefined }
+    { project: project._id },
+    //{ project: project.title },
+    { $unset: { project: project._id } }
   );
+  console.log(allTasks);
 });
 
 const Project = mongoose.model("Project", projectSchema);

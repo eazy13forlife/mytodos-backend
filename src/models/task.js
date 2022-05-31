@@ -35,6 +35,7 @@ const taskSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      maxLength: [500, "Title must not be greater than 500 characters"],
     },
     completed: {
       type: Boolean,
@@ -51,7 +52,8 @@ const taskSchema = new mongoose.Schema(
       type: String,
     },
     project: {
-      type: String,
+      //type: String,
+      type: mongoose.Schema.Types.ObjectId,
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
@@ -72,11 +74,17 @@ taskSchema.pre("save", async function () {
     const user = await mongoose.model("User").findById(task.owner);
     //if task is now completed, increment user.taskCompleted
     if (task.completed) {
+      /*
+      await user.update(
+        { $inc: { tasksCompleted: 1 } },
+        { runValidators: true }
+      );
+*/
+
       user.tasksCompleted += 1;
-      //else if task was modified and now not completed decrement tasksCompleted. But initially completed will be set to false,which counts as modified, so in this case, we don't want to do anything. This corresponds with tasksCompleted equaling 0, falsy.
-    } else if (!task.completed && user.tasksCompleted) {
-      user.tasksCompleted -= 1;
+      //else if task was modified and now not completed decrement tasksCompleted. But initially completed will be set to false,which counts as modified, so in this case, we don't want to do anything. This corresponds with tasksCompleted equaling 0, falsy. This won't work because when i first create task value is set to false, so this will decrement it automatically.
     }
+
     //we only want to validate modified field. Everything else would have been validated
     await user.save({ validateModifiedOnly: true });
   }

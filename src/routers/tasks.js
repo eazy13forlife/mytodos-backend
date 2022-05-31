@@ -11,6 +11,9 @@ router.post("/tasks", authenticateMiddleware, async (req, res) => {
   try {
     const taskData = req.body;
 
+    if (!taskData.project) {
+      taskData.project = undefined;
+    }
     const task = new Task(taskData);
 
     //we need to provide the id of owner ourself, since the user won't
@@ -53,19 +56,25 @@ router.patch("/tasks/:id", authenticateMiddleware, async (req, res) => {
 
     const task = await Task.findById(id);
 
+    const initialTask = { ...task._doc };
+
     if (!task) {
       return res.status(404).send();
     }
 
     updateFields.forEach((field) => {
-      task[field] = updateData[field];
+      if (!updateData[field]) {
+        task[field] = undefined;
+      } else {
+        task[field] = updateData[field];
+      }
     });
 
-    const updatedTask = await task.save();
+    const updatedTask = await task.save({ validateModifiedOnly: true });
 
-    res.send(updatedTask);
+    res.send({ original: initialTask, updated: updatedTask });
   } catch (e) {
-    res.status(500).send(e);
+    res.status(400).send(e);
   }
 });
 
@@ -130,7 +139,7 @@ router.get("/tasks", authenticateMiddleware, async (req, res) => {
 
     res.status(200).send(req.user.tasks);
   } catch (e) {
-    res.status(500).send(e);
+    res.status(500).send(e.stack);
   }
 });
 
@@ -147,8 +156,8 @@ router.delete("/tasks/:id", authenticateMiddleware, async (req, res) => {
     }
 
     res.send(deletedTask);
-  } catch {
-    res.status(500).send();
+  } catch (e) {
+    res.status(500).send(e);
   }
 });
 

@@ -16,7 +16,7 @@ router.post("/projects", authenticateMiddleware, async (req, res) => {
 
     res.status(201).send(savedProject);
   } catch (e) {
-    res.status(400).send({ error: e.message });
+    res.status(400).send(e);
   }
 });
 
@@ -56,6 +56,25 @@ router.patch("/projects/:id", authenticateMiddleware, async (req, res) => {
     res.send(savedProject);
   } catch (e) {
     res.status(404).send({ error: e.message });
+  }
+});
+
+router.get("/projects/:id", authenticateMiddleware, async (req, res) => {
+  try {
+    const projectId = req.params.id;
+
+    const project = await Project.findOne({
+      _id: projectId,
+      owner: req.user._id,
+    });
+
+    if (!project) {
+      res.status(404).send();
+    }
+
+    res.send(project);
+  } catch (e) {
+    res.status(500).send(e.message);
   }
 });
 
@@ -112,7 +131,8 @@ router.get("/projects/:id/tasks", authenticateMiddleware, async (req, res) => {
     }
 
     const allTasks = await Task.find({
-      project: project.title,
+      project: project._id,
+      //project: project.title,
       owner: req.user._id,
       ...match,
     }).sort(sort);
@@ -127,11 +147,18 @@ router.delete("/projects/:id", authenticateMiddleware, async (req, res) => {
   try {
     const projectId = req.params.id;
 
-    await Project.findOneAndDelete({ _id: projectId });
+    const deletedTask = await Project.findOneAndDelete({
+      _id: projectId,
+      owner: req.user._id,
+    });
+
+    if (!deletedTask) {
+      return res.status(404).send();
+    }
 
     res.send();
   } catch (e) {
-    res.status(500).send({ e: e.message });
+    res.status(500).send(e);
   }
 });
 
