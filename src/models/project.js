@@ -6,7 +6,6 @@ const projectSchema = new mongoose.Schema({
     type: String,
     trim: true,
     required: [true, "Required"],
-    unique: true,
     maxLength: [120, "Title must not be greater than 120 characters"],
   },
   owner: {
