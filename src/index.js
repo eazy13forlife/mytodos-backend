@@ -35,9 +35,7 @@ app.use(usersRouter);
 app.use(tasksRouter);
 app.use(notesRouter);
 app.use(projectsRouter);
-app.options("/*", (req, res) => {
-  res.send();
-});
+
 app.listen(port, () => {
   console.log(`Your express server is running on port ${port}.`);
 });
