@@ -24,7 +24,7 @@ const publicPath = path.join(__dirname, "../public/");
 app.use(
   cors({
     allowedHeaders: ["Content-Type", "authorization", "Accept"],
-    origin: "*",
+    origin: "https://baffour-todos-backend.herokuapp.com",
     preflightContinue: true,
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
   })
@@ -35,9 +35,7 @@ app.use(usersRouter);
 app.use(tasksRouter);
 app.use(notesRouter);
 app.use(projectsRouter);
-app.options("/*", (req, res) => {
-  res.send();
-});
+
 app.listen(port, () => {
   console.log(`Your express server is running on port ${port}.`);
 });
