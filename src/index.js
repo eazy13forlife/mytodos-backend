@@ -26,6 +26,7 @@ app.use(
     allowedHeaders: ["Content-Type", "authorization"],
     origin: "https://mytodos-frontend.vercel.app",
     preflightContinue: true,
+    methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
   })
 );
 //server parses incoming json received
