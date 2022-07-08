@@ -23,8 +23,8 @@ const publicPath = path.join(__dirname, "../public/");
 
 app.use(
   cors({
-    allowedHeaders: ["Content-Type", "authorization"],
-    origin: "https://mytodos-frontend.vercel.app",
+    allowedHeaders: ["Content-Type", "authorization", "Accept"],
+    origin: "*",
     preflightContinue: true,
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
   })
