@@ -31,6 +31,9 @@ app.use(
 );
 //server parses incoming json received
 app.use(express.json());
+app.options("/*", (req, res) => {
+  res.send();
+});
 app.use(usersRouter);
 app.use(tasksRouter);
 app.use(notesRouter);
