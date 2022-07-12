@@ -2,7 +2,7 @@ const express = require("express");
 const router = new express.Router();
 const moment = require("moment");
 
-const Project = require("..//models/project.js");
+const Project = require("../models/project.js");
 const Task = require("../models/task.js");
 const authenticateMiddleware = require("../middleware/authenticate.js");
 
