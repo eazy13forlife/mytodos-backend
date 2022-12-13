@@ -20,11 +20,11 @@ const publicPath = path.join(__dirname, "../public/");
 
 //set up express to use public directory
 //app.use(express.static(publicPath));
-const dog = "yes";
+
 app.use(
   cors({
     allowedHeaders: ["Content-Type", "authorization", "Accept"],
-    origin: "https://mytodos-frontend.vercel.app",
+    origin: "*",
     preflightContinue: true,
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
   })
